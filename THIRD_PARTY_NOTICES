@@ -1,0 +1,9 @@
+This project interoperates with and contains adapter logic informed by:
+
+medsos
+https://github.com/suhz/medsos
+Copyright (c) 2026 Suhaimi Amir (suhz)
+
+The referenced project is licensed under the MIT License. Its copyright and
+license notice are retained here because this adapter's Python dispatch layer
+follows the original tool contract and handler behavior.

@@ -1,0 +1,16 @@
+{
+  "name": "pi-threads",
+  "version": "0.1.0",
+  "description": "Pi tools for managing Threads accounts, posts, and replies",
+  "keywords": ["pi-package"],
+  "type": "module",
+  "private": true,
+  "pi": {
+    "extensions": ["./extension.ts"]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  }
+}
