@@ -19,7 +19,9 @@ service. The backend still owns:
 - Threads webhook handling
 
 See [README.md](README.md) for setup and [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES)
-for attribution.
+for attribution. Before changing backend setup assumptions, read the upstream
+[`medsos` README](https://github.com/suhz/medsos/blob/main/README.md) and
+[`medsos` AGENTS.md](https://github.com/suhz/medsos/blob/main/AGENTS.md).
 
 ## Repository layout
 
@@ -46,6 +48,29 @@ for attribution.
   confirmation is required.
 - Preserve attribution when changing code derived from the upstream tool
   contract; update `THIRD_PARTY_NOTICES` when copying substantial new logic.
+- Never commit or push changes unless the operator explicitly asks for it.
+
+## Backend prerequisite
+
+This repository is only the Pi extension. It depends on a separately installed
+and running Python backend from:
+
+```text
+https://github.com/suhz/medsos
+```
+
+An agent helping an operator should follow the upstream `README.md` and
+`AGENTS.md` to:
+
+1. create the Python virtualenv and install `medsos` with its dev extras;
+2. collect human-supplied Meta credentials and a public HTTPS callback URL;
+3. create the backend `.env` without printing secrets;
+4. run `alembic upgrade head`;
+5. start the Flask service and verify `/healthz`; and
+6. configure Meta OAuth and webhook URLs.
+
+Do not call the upstream `medsos-install` command. It wires a Hermes plugin,
+not this Pi extension.
 
 ## Local configuration
 
@@ -57,8 +82,9 @@ export MEDSOS_PYTHON=/absolute/path/to/python-backend/.venv/bin/python
 ```
 
 The Python backend and Pi must receive the same required `MEDSOS_*` variables.
-Do not invent Meta App ID or App Secret values. Ask the operator for missing
-credentials.
+Pi also needs `MEDSOS_ROOT` and `MEDSOS_PYTHON` so `bridge.py` can use the
+backend checkout and virtualenv. Do not invent Meta App ID or App Secret
+values. Ask the operator for missing credentials.
 
 ## Validation
 

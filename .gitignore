@@ -1,0 +1,25 @@
+# Secrets and local backend configuration
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local databases and runtime artifacts
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# Node/Pi local installs
+node_modules/
+.pi/
+
+# OS/editor files
+.DS_Store
+.vscode/
+.idea/

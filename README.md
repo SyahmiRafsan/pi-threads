@@ -37,35 +37,63 @@ Publishing and deleting retain the backend's external side effects. Set
 
 ## Setup
 
-The Python backend must be installed separately. It currently expects its
-existing `MEDSOS_*` environment variables.
+`pi-threads` is **only a Pi extension**. It does not contain, install, or run
+the Python backend. The backend is provided by the upstream
+[`suhz/medsos`](https://github.com/suhz/medsos) project.
+
+### 1. Install the Python backend
 
 ```sh
-# Python backend
+git clone https://github.com/suhz/medsos.git /path/to/medsos
 cd /path/to/medsos
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -e ".[dev]"
-alembic upgrade head
+cp .env.example .env
+chmod 600 .env
 ```
 
-Configure the backend's `.env`, start its Flask service, and configure the
-public Meta webhook and OAuth URLs as described by that backend's docs.
+Before filling `.env`, read the upstream
+[README](https://github.com/suhz/medsos/blob/main/README.md) and
+[AGENTS.md](https://github.com/suhz/medsos/blob/main/AGENTS.md). A human must
+provide the Meta App ID, Meta App Secret, webhook verify token, and public
+HTTPS callback URL. Do not invent Meta credentials.
 
-Then configure Pi:
+Run the backend migrations and API:
+
+```sh
+alembic upgrade head
+set -a && . .env && set +a
+python scripts/serve.py
+# in another terminal:
+curl -sS http://127.0.0.1:8768/healthz
+```
+
+The backend also needs a public HTTPS route for the Meta OAuth callback and
+Threads webhook. Follow the upstream README to configure the reverse proxy,
+tunnel, and Meta dashboard URLs.
+
+### 2. Install the Pi extension
+
+In a shell that can see the same `MEDSOS_*` variables as the backend:
 
 ```sh
 export MEDSOS_ROOT=/path/to/medsos
 export MEDSOS_PYTHON=/path/to/medsos/.venv/bin/python
 
-pi install /path/to/pi-threads
-# or test without persisting the install:
+# Install from the public repository:
+pi install https://github.com/SyahmiRafsan/pi-threads
+
+# Or test a local checkout without saving the install:
 pi -e /path/to/pi-threads
 ```
 
-Pi and the Python process must see the same `MEDSOS_*` environment variables.
-`threads_add_account` returns an authorize URL; open it in a browser and then
-call `threads_find_accounts` to verify the account.
+The extension starts `bridge.py` for each tool call. The bridge imports
+`medsos.ops`, so the backend Python environment, database, and required
+`MEDSOS_*` variables must be available to Pi as well.
+
+`threads_add_account` returns an OAuth authorize URL. Open it in a browser,
+complete approval, then call `threads_find_accounts` to verify the account.
 
 ## Attribution
 
